@@ -205,10 +205,10 @@ public class MyPacMan extends Controller<MOVE>
 //			System.out.println("Class Value "+i+" is " + classValue);
 //		}
 		
-		//create and build the classifier
-		J48 nb = new J48();
-		//NaiveBayes nb = new NaiveBayes();
-		nb.buildClassifier(my_bayes_controller.getTrainingDataset());
+//		//create and build the classifier
+//		J48 nb = new J48();
+//		//NaiveBayes nb = new NaiveBayes();
+//		nb.buildClassifier(my_bayes_controller.getTrainingDataset());
 
 		
 		//load new dataset
@@ -222,7 +222,8 @@ public class MyPacMan extends Controller<MOVE>
 		String predString = "NEUTRAL";
 		BayesNet bn = my_bayes_controller.getBayesNet();
 		testingDataset.setClassIndex(0);
-
+//		System.out.println(testingDataset.numAttributes());
+//		System.out.println(testingDataset.numAttributes());
 		//for (int i = 0; i < testingDataset.numInstances(); i++) {
 			//get class double value for current instance
 			double actualClass = testingDataset.instance(0).classValue();
@@ -230,7 +231,9 @@ public class MyPacMan extends Controller<MOVE>
 			String actual = testingDataset.classAttribute().value((int) actualClass);
 			//get Instance object of current instance
 			Instance newInst = testingDataset.instance(0);
+			newInst.setDataset(my_bayes_controller.getTrainingDataset());
 			//call classifyInstance, which returns a double value for the class
+//			System.out.println(bn.classifyInstance(newInst));
 			double predNB = bn.classifyInstance(newInst);
 			//use this value to get string value of the predicted class
 			predString = testingDataset.classAttribute().value((int) predNB);

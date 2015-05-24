@@ -24,8 +24,14 @@ public class BayesController {
 		try {
 			DiscretizeDataset();
 		} catch (Exception e) {
-			System.out.println("DISCRETIZE EXCEPTION: " + e);
+			System.out.println("DISCRETIZE FILTER EXCEPTION: " + e);
 		}
+		
+//		try {
+//			FilterRemoveDataset();
+//		} catch (Exception e) {
+//			System.out.println("REMOVE FILTER EXCEPTION: " + e);
+//		}
 		
 		try {
 			BuildClassifier();
@@ -57,25 +63,25 @@ public class BayesController {
 		discretize.setInputFormat(trainingDataset);
 		trainingDataset = Filter.useFilter(trainingDataset, discretize);
 	}
-	/*
-	private void FilterDataset()
-	{
-		//use a simple filter to remove a certain attribute	
-		//set up options to remove 1st attribute	
-		String[] opts = new String[]{ "-R", "1"};
-		//create a Remove object (this is the filter class)
-		AttributeSelection att_selection = new AttributeSelection();
-		//Remove remove = new Remove();
-		//set the filter options
-		att_selection.setOptions(opts);
-		//pass the dataset to the filter
-		remove.setInputFormat(trainDataset);
-		remove.setInputFormat(testingDataset);
-		//apply the filter
-		trainDataset = Filter.useFilter(trainDataset, remove);
-		testingDataset = Filter.useFilter(testingDataset, remove);
-	}
-	*/
+	
+//	private void FilterRemoveDataset()
+//	{
+//		//use a simple filter to remove a certain attribute	
+//		//set up options to remove 1st attribute	
+//		String[] opts = new String[]{ "-S", "weka.attributeSelection.Ranker", "-T", "0.05", "-N", "-1", "-E", "-W"};
+//		//create a Remove object (this is the filter class)
+//		AttributeSelection attr_selection = new AttributeSelection();
+//		//Remove remove = new Remove();
+//		//set the filter options
+//		attr_selection.setOptions(opts);
+//		//pass the dataset to the filter
+//		remove.setInputFormat(trainDataset);
+//		remove.setInputFormat(testingDataset);
+//		//apply the filter
+//		trainDataset = Filter.useFilter(trainDataset, remove);
+//		testingDataset = Filter.useFilter(testingDataset, remove);
+//	}
+	
 	public BayesNet getBayesNet()
 	{
 		return my_bayes_net;
