@@ -16,10 +16,14 @@ public class BayesNetGenerator
 
 	public BayesNetGenerator() throws Exception
 	{
-		DataSource source = new DataSource("arff/pacman_discretized_attr_selected.arff");
+		//GET DATASET
+		DataSource source = new DataSource("arff/pacman_attr_selected.arff");
 		dataset = source.getDataSet();
+		
+		//SET CLASS
 		dataset.setClassIndex(dataset.numAttributes()-1);
 		
+		//BUILD BAYESNET
 		my_bayes_net = new BayesNet();
 		my_bayes_net.buildClassifier(dataset);
 		
@@ -28,7 +32,6 @@ public class BayesNetGenerator
 		String[] options_k2 = new String[4];
 		options_k2[0] = "-P"; options_k2[1] = "2";
 		options_k2[2] = "-S"; options_k2[3] = "LOO-CV";
-		//options_k2[4] = "-E"; options_k2[5] = "weka.classifiers.bayes.net.estimate.SimpleEstimator";
 		search_alg.setOptions(options_k2);
 		
 		//ESTIMATOR
@@ -37,16 +40,24 @@ public class BayesNetGenerator
 		options_estimator[0] = "-A"; options_estimator[1] = "0.5";
 		estimator.setOptions(options_estimator);
 		
+		//SETTING SEARCH ALG AND ESTIMATOR
 		my_bayes_net.setSearchAlgorithm(search_alg);
 		my_bayes_net.setEstimator(estimator);
-		
 		
 		//EVALUATION
 		Evaluation eval = new Evaluation(dataset);
 		eval.crossValidateModel(my_bayes_net,dataset,10,new Random(1));
 		
-        
-        //search_alg
-		System.out.println("asdasd");
+		System.out.println(eval.toSummaryString("Evaluation results:\n", false));
+		
+		System.out.println("BAYES NET FINISHED!");
+	}
+	
+	public BayesNet getBayesNet() {
+		return my_bayes_net;
+	}
+	
+	public Instances getDataset() {
+		return dataset;
 	}
 }
