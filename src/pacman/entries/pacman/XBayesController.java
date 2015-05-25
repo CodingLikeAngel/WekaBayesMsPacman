@@ -1,0 +1,115 @@
+package pacman.entries.pacman;
+
+import java.util.Random;
+
+import weka.core.Instances;
+import weka.core.converters.ConverterUtils.DataSource;
+import weka.classifiers.Evaluation;
+import weka.classifiers.bayes.BayesNet;
+import weka.filters.Filter;
+import weka.filters.supervised.attribute.Discretize;
+import weka.filters.supervised.attribute.AttributeSelection;
+
+
+public class XBayesController {
+	private Instances originalDataset;
+	private Instances trainingDataset;
+	private BayesNet my_bayes_net;
+	
+	public XBayesController() throws Exception
+	{
+		DataSource source = new DataSource("arff/PACMAN.arff");
+		originalDataset = source.getDataSet();
+		originalDataset.setClassIndex(0);
+		
+		trainingDataset = new Instances(originalDataset);
+		
+		try {
+			DiscretizeDataset();
+		} catch (Exception e) {
+			System.out.println("DISCRETIZE FILTER EXCEPTION: " + e);
+		}
+		
+//		try {
+//			FilterRemoveDataset();
+//		} catch (Exception e) {
+//			System.out.println("REMOVE FILTER EXCEPTION: " + e);
+//		}
+		
+		try {
+			BuildClassifier();
+		} catch (Exception e) {
+			System.out.println("BUILD CLASSIFIER EXCEPTION: " + e);
+		}
+		
+		try {
+			Evaluate();
+		} catch (Exception e) {
+			System.out.println("EVALUATE EXCEPTION: " + e.getMessage());
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private void BuildClassifier() throws Exception
+	{
+		my_bayes_net = new BayesNet();
+		my_bayes_net.buildClassifier(trainingDataset);
+	}
+	
+	private void Evaluate() throws Exception
+	{
+		Evaluation eval = new Evaluation(trainingDataset);
+		eval.crossValidateModel(my_bayes_net, trainingDataset, 10, new Random(1));
+	}
+
+	private void DiscretizeDataset() throws Exception
+	{
+		//set options
+		String[] options = new String[5];
+		//choose the number of intervals, e.g. 2 :
+		options[0] = "-B"; options[1] = "10";
+		//choose the range of attributes on which to apply the filter:
+		options[2] = "-R";
+		options[3] = "1-1";
+		options[4] = "-V";
+		//Apply discretization:
+		Discretize discretize = new Discretize();
+		discretize.setOptions(options);
+		discretize.setInputFormat(trainingDataset);
+		trainingDataset = Filter.useFilter(trainingDataset, discretize);
+	}
+	
+//	private void FilterRemoveDataset()
+//	{
+//		//use a simple filter to remove a certain attribute	
+//		//set up options to remove 1st attribute	
+//		String[] opts = new String[]{ "-S", "weka.attributeSelection.Ranker", "-T", "0.05", "-N", "-1", "-E", "-W"};
+//		//create a Remove object (this is the filter class)
+//		AttributeSelection attr_selection = new AttributeSelection();
+//		//Remove remove = new Remove();
+//		//set the filter options
+//		attr_selection.setOptions(opts);
+//		//pass the dataset to the filter
+//		remove.setInputFormat(trainDataset);
+//		remove.setInputFormat(testingDataset);
+//		//apply the filter
+//		trainDataset = Filter.useFilter(trainDataset, remove);
+//		testingDataset = Filter.useFilter(testingDataset, remove);
+//	}
+	
+	public BayesNet getBayesNet()
+	{
+		return my_bayes_net;
+	}
+	
+	public Instances getOriginalDataset()
+	{
+		return originalDataset;
+	}
+	
+	public Instances getTrainingDataset()
+	{
+		return trainingDataset;
+	}
+}

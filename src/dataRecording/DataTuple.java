@@ -159,7 +159,7 @@ public class DataTuple {
 	public String getSaveString() {
 		StringBuilder stringbuilder = new StringBuilder();
 
-		stringbuilder.append(this.DirectionChosen + ";");
+//		stringbuilder.append(this.DirectionChosen + ";");
 		stringbuilder.append(this.mazeIndex + ";");
 		stringbuilder.append(this.currentLevel + ";");
 		stringbuilder.append(this.pacmanPosition + ";");
@@ -189,7 +189,8 @@ public class DataTuple {
 		stringbuilder.append(this.inkyPosition + ";");
 		stringbuilder.append(this.pinkyPosition + ";");
 		stringbuilder.append(this.suePosition + ";");
-
+		//reordenado
+		stringbuilder.append(this.DirectionChosen + ";");
 
 		return stringbuilder.toString();
 	}
