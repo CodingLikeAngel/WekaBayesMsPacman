@@ -5,7 +5,7 @@ import java.util.Random;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.estimate.SimpleEstimator;
-import weka.classifiers.bayes.net.search.global.K2;
+import weka.classifiers.bayes.net.search.local.K2;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
@@ -17,7 +17,7 @@ public class BayesNetGenerator
 	public BayesNetGenerator() throws Exception
 	{
 		//GET DATASET
-		DataSource source = new DataSource("arff/pacman_attr_selected.arff");
+		DataSource source = new DataSource("arff/pacman_discretized_attr_selected.arff");
 		dataset = source.getDataSet();
 		
 		//SET CLASS

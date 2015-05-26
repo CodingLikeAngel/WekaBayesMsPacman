@@ -10,6 +10,9 @@ import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.converters.ConverterUtils.DataSource;
+import weka.filters.supervised.attribute.Discretize;
+import weka.filters.Filter;
 
 public class BayesPacmanController extends Controller<MOVE>
 {
@@ -19,6 +22,8 @@ public class BayesPacmanController extends Controller<MOVE>
 	private Instances dataset;
 	private MOVE myMove=MOVE.NEUTRAL;
 	
+	private Instances dataset1;	
+	
 	public MOVE getMove(Game game, long timeDue) 
 	{
 		if(bayesnet == null)
@@ -26,7 +31,10 @@ public class BayesPacmanController extends Controller<MOVE>
 			try {
 				BayesNetGenerator gen = new BayesNetGenerator();
 				bayesnet = gen.getBayesNet();
-				dataset = gen.getDataset();
+				dataset1 = gen.getDataset();
+				DataSource source = new DataSource("arff/pacman_attr_selected.arff");
+				dataset = source.getDataSet();
+				dataset.setClassIndex(dataset.numAttributes()-1);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -38,9 +46,12 @@ public class BayesPacmanController extends Controller<MOVE>
 		PopulateInstance(game, timeDue);
 		
 		double predNB = 4;
+		dataset.setClassIndex(dataset.numAttributes()-1);
+		int num = dataset.numInstances()-1;
 		try {
-			predNB = bayesnet.classifyInstance(current_instance);
+			predNB = bayesnet.classifyInstance(dataset.instance(dataset.numInstances()-1));
 		} catch (Exception e) {
+			System.out.println("EVALUATE EXCEPTION: " + e.getMessage());
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -57,61 +68,93 @@ public class BayesPacmanController extends Controller<MOVE>
 			{
 				case 0:
 					//int time = game.getTotalTime();
-					current_instance.setValue(attributes[i].NUMERIC, game.getTotalTime()); 
+					current_instance.setValue(i, game.getTotalTime()); 
 					break;
 				case 1:
-					current_instance.setValue(attributes[i].NUMERIC, game.getScore());
+					current_instance.setValue(i, game.getScore());
 					break;
 				case 2:
-					current_instance.setValue(attributes[i].NUMERIC, game.getNumberOfActivePills());
+					int a = game.getNumberOfActivePills();
+					current_instance.setValue(i, a);
 					break;
 				case 3:
-					
-					current_instance.setValue(attributes[i].NOMINAL, game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(GHOST.BLINKY), DM.PATH).ordinal());
+					current_instance.setValue(i, game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(GHOST.BLINKY), DM.PATH).ordinal());
 					break;
 				case 4:
-					current_instance.setValue(attributes[i].NOMINAL, game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(GHOST.SUE), DM.PATH).ordinal());
+					current_instance.setValue(i, game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(GHOST.SUE), DM.PATH).ordinal());
 					break;
 				case 5:
-					current_instance.setValue(attributes[i].NOMINAL, game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(GHOST.PINKY), DM.PATH).ordinal());
+					current_instance.setValue(i, game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(GHOST.PINKY), DM.PATH).ordinal());
 					break;
 				case 6:
-					current_instance.setValue(attributes[i].NOMINAL, game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(GHOST.INKY), DM.PATH).ordinal());
+					current_instance.setValue(i, game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(GHOST.INKY), DM.PATH).ordinal());
 					break;
 				case 7:
-					current_instance.setValue(attributes[i].NUMERIC, game.getCurrentLevel());
+					current_instance.setValue(i, game.getCurrentLevel());
 					break;
 				case 8:
-					current_instance.setValue(attributes[i].NUMERIC, game.getPacmanCurrentNodeIndex());
+					current_instance.setValue(i, game.getPacmanCurrentNodeIndex());
 					break;
 				case 9:
-					current_instance.setValue(attributes[i].NUMERIC, game.getGhostCurrentNodeIndex(GHOST.INKY));
+					current_instance.setValue(i, game.getGhostCurrentNodeIndex(GHOST.INKY));
 					break;
 				case 10:
-					current_instance.setValue(attributes[i].NUMERIC, game.getGhostCurrentNodeIndex(GHOST.BLINKY));
+					current_instance.setValue(i, game.getGhostCurrentNodeIndex(GHOST.BLINKY));
 					break;
 				case 11:
-					current_instance.setValue(attributes[i].NUMERIC, game.getShortestPathDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(GHOST.INKY)));
+					current_instance.setValue(i, game.getShortestPathDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(GHOST.INKY)));
 					break;
 				case 12:
-					current_instance.setValue(attributes[i].NUMERIC, game.getGhostCurrentNodeIndex(GHOST.PINKY));
+					current_instance.setValue(i, game.getGhostCurrentNodeIndex(GHOST.PINKY));
 					break;
 				case 13:
-					current_instance.setValue(attributes[i].NUMERIC, game.getGhostCurrentNodeIndex(GHOST.SUE));
+					current_instance.setValue(i, game.getGhostCurrentNodeIndex(GHOST.SUE));
 					break;
 				case 14:
-					current_instance.setValue(attributes[i].NUMERIC, game.getShortestPathDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(GHOST.SUE)));
+					current_instance.setValue(i, game.getShortestPathDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(GHOST.SUE)));
 					break;
 				case 15:
-					current_instance.setValue(attributes[i].NUMERIC, game.getShortestPathDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(GHOST.PINKY)));
+					current_instance.setValue(i, game.getShortestPathDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(GHOST.PINKY)));
 					break;
 				case 16:
-					current_instance.setValue(attributes[i].NUMERIC, game.getShortestPathDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(GHOST.BLINKY)));
+					current_instance.setValue(i, game.getShortestPathDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(GHOST.BLINKY)));
 					break;
 				case 17:
-					current_instance.setValue(attributes[i].NOMINAL, 4);
+					current_instance.setValue(i,4);
 					break;
 			}
+		}
+		
+		//dataset.add(current_instance);
+//		current_instance.dataset().add(current_instance);
+		
+		Discretize();
+	}
+	
+	private void Discretize()
+	{
+		String[] options = new String[2];
+		options[0] = "-R";
+		options[1] = "first-last";
+		//Apply discretization:
+		Discretize discretize = new Discretize();
+		try {
+			discretize.setOptions(options);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			discretize.setInputFormat(dataset);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			dataset = Filter.useFilter(dataset, discretize);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -146,6 +189,6 @@ public class BayesPacmanController extends Controller<MOVE>
 		attributes[16] = new Attribute("blinkyDist");
 		attributes[17] = new Attribute("directionChosen", direction_nominals);
 		
-		current_instance.setDataset(dataset);
+		//current_instance.setDataset(dataset);
 	}
 }
