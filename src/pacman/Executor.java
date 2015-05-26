@@ -25,7 +25,6 @@ import pacman.controllers.examples.RandomPacMan;
 import pacman.controllers.examples.StarterGhosts;
 import pacman.controllers.examples.StarterPacMan;
 import pacman.entries.pacman.BayesPacmanController;
-import pacman.entries.pacman.XMyPacMan;
 import pacman.game.Game;
 import pacman.game.GameView;
 import static pacman.game.Constants.*;
@@ -88,7 +87,7 @@ public class Executor
 		//run game for data collection
 		//exec.runGameTimed(new DataCollectorController(new KeyBoardInput()),new StarterGhosts(),visual);
 		
-		exec.runGame(new BayesPacmanController(),new StarterGhosts(),visual,15);
+		exec.runGame(new BayesPacmanController(),new StarterGhosts(),visual,0);
 	}
 	
     /**

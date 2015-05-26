@@ -10,7 +10,6 @@ import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.supervised.attribute.Discretize;
 import weka.filters.Filter;
 
@@ -20,9 +19,10 @@ public class BayesPacmanController extends Controller<MOVE>
 	private Attribute[] attributes;
 	private BayesNet bayesnet = null;
 	private Instances dataset;
+	private Instances dataset_base;
 	private MOVE myMove=MOVE.NEUTRAL;
 	
-	private Instances dataset1;	
+//	private Instances dataset1;	
 	
 	public MOVE getMove(Game game, long timeDue) 
 	{
@@ -31,23 +31,22 @@ public class BayesPacmanController extends Controller<MOVE>
 			try {
 				BayesNetGenerator gen = new BayesNetGenerator();
 				bayesnet = gen.getBayesNet();
-				dataset1 = gen.getDataset();
-				DataSource source = new DataSource("arff/pacman_attr_selected.arff");
-				dataset = source.getDataSet();
-				dataset.setClassIndex(dataset.numAttributes()-1);
+//				dataset1 = gen.getDataset();
+//				DataSource source = new DataSource("arff/a.arff");
+//				dataset_base = source.getDataSet();
+//				dataset_base.setClassIndex(dataset.numAttributes()-1);
+				dataset_base = gen.getDatasetOrig();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
 			CreateInstance();
 		}
-		
+		dataset = new Instances(dataset_base);
 		PopulateInstance(game, timeDue);
 		
 		double predNB = 4;
 		dataset.setClassIndex(dataset.numAttributes()-1);
-		int num = dataset.numInstances()-1;
 		try {
 			predNB = bayesnet.classifyInstance(dataset.instance(dataset.numInstances()-1));
 		} catch (Exception e) {
@@ -125,7 +124,7 @@ public class BayesPacmanController extends Controller<MOVE>
 			}
 		}
 		
-		//dataset.add(current_instance);
+		dataset.add(current_instance);
 //		current_instance.dataset().add(current_instance);
 		
 		Discretize();
