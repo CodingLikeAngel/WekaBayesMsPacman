@@ -1,0 +1,23 @@
+@relation 'pacman-weka.filters.supervised.attribute.AttributeSelection-Eweka.attributeSelection.FilteredAttributeEval -W \"weka.attributeSelection.InfoGainAttributeEval \" -F \"weka.filters.supervised.instance.SpreadSubsample -M 0.0 -X 0.0 -S 1\"-Sweka.attributeSelection.Ranker -T 0.05 -N -1'
+
+@attribute totalGameTime numeric
+@attribute currentScore numeric
+@attribute numOfPillsLeft numeric
+@attribute blinkyDir {UP,RIGHT,DOWN,LEFT,NEUTRAL}
+@attribute sueDir {UP,RIGHT,DOWN,LEFT,NEUTRAL}
+@attribute pinkyDir {UP,RIGHT,DOWN,LEFT,NEUTRAL}
+@attribute inkyDir {UP,RIGHT,DOWN,LEFT,NEUTRAL}
+@attribute currentLevelTime numeric
+@attribute pacmanPosition numeric
+@attribute inkyPosition numeric
+@attribute blinkyPosition numeric
+@attribute inkyDist numeric
+@attribute pinkyPosition numeric
+@attribute suePosition numeric
+@attribute sueDist numeric
+@attribute pinkyDist numeric
+@attribute blinkyDist numeric
+@attribute directionChosen {UP,RIGHT,DOWN,LEFT,NEUTRAL}
+
+@data
+0,0,220,RIGHT,RIGHT,RIGHT,RIGHT,0,978,1292,1292,-1,1292,1292,-1,-1,-1,LEFT

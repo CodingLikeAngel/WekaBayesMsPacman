@@ -13,52 +13,67 @@ import weka.core.Instances;
 import weka.filters.supervised.attribute.Discretize;
 import weka.filters.Filter;
 
+/**
+ * Implementation of the controller.
+ * BayesPacmanController creates a bayes network using BayesNetGenerator class and uses it to get every move of the Pacman.
+ * 
+ * @author Carlos Bailón Pérez and Daniel Castaño Estrella
+ * @version 1.0
+ */
 public class BayesPacmanController extends Controller<MOVE>
 {
-	private Instance current_instance;
-	private Attribute[] attributes;
-	private BayesNet bayesnet = null;
-	private Instances dataset;
-	private Instances dataset_base;
-	private MOVE myMove=MOVE.NEUTRAL;
+	private Instance current_instance;		//data set with data of current game time
+	private Attribute[] attributes;			//array of attributes used in the Instance
+	private BayesNet bayesnet = null;		//Bayes network
+	private Instances dataset;				//dataset to use every time to discretize
+	private Instances dataset_base;			//base dataset without being discretized
+	private MOVE myMove=MOVE.NEUTRAL;		//next move
 	
-//	private Instances dataset1;	
-	
+	/**
+	 * Method that returnsthe next move
+	 */
 	public MOVE getMove(Game game, long timeDue) 
 	{
+		//first time, we create the bayes network
 		if(bayesnet == null)
 		{
 			try {
 				BayesNetGenerator gen = new BayesNetGenerator();
 				bayesnet = gen.getBayesNet();
-//				dataset1 = gen.getDataset();
-//				DataSource source = new DataSource("arff/a.arff");
-//				dataset_base = source.getDataSet();
-//				dataset_base.setClassIndex(dataset.numAttributes()-1);
 				dataset_base = gen.getDatasetOrig();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			//call the method that creates current instance and set the attributes
 			CreateInstance();
 		}
+		//make copy ofthe original dataset of the bayes network
 		dataset = new Instances(dataset_base);
+		//call the method that populates the current instance with game data
 		PopulateInstance(game, timeDue);
 		
+		//predNB is the next move nominal position (UP;RIGHT;DOWN;LEFT;NEUTRAL) we set it to NEUTRAL to makethatmove in case classifyInstance fails
 		double predNB = 4;
+		//setting of the class attribute (chosenDirection)
 		dataset.setClassIndex(dataset.numAttributes()-1);
 		try {
+			//make the prediction
 			predNB = bayesnet.classifyInstance(dataset.instance(dataset.numInstances()-1));
 		} catch (Exception e) {
 			System.out.println("EVALUATE EXCEPTION: " + e.getMessage());
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		//set myMove and return it
 		myMove = MOVE.valueOf(dataset.classAttribute().value((int) predNB));
 		System.out.println(myMove.toString());
 		return myMove;
 	}
 
+	/**
+	 * Method that populates the array attributes with current game data and set it to the current instance
+	 * @param game game data
+	 * @param timeDue time data
+	 */
 	private void PopulateInstance(Game game, long timeDue)
 	{
 		for (int i = 0; i < attributes.length; i++)
@@ -124,14 +139,19 @@ public class BayesPacmanController extends Controller<MOVE>
 			}
 		}
 		
+		//add current instance to dataset
 		dataset.add(current_instance);
-//		current_instance.dataset().add(current_instance);
 		
+		//call discretization method
 		Discretize();
 	}
 	
+	/**
+	 * Method that applies a discretization filterto the dataset
+	 */
 	private void Discretize()
 	{
+		//set options -> discretize all numerics
 		String[] options = new String[2];
 		options[0] = "-R";
 		options[1] = "first-last";
@@ -157,11 +177,17 @@ public class BayesPacmanController extends Controller<MOVE>
 		}
 	}
 
+	/**
+	 * Method that creates the base of current instances. That means setting the attributes
+	 */
 	private void CreateInstance()
 	{
+		//construct an instance with 18 attributes
 		current_instance = new Instance(18); 
+		//construct array of attributes
 		attributes = new Attribute[18];
 		
+		//construct and set direction nominal values
 		FastVector direction_nominals = new FastVector(5); 
 		direction_nominals.addElement("UP");
 		direction_nominals.addElement("RIGHT");
@@ -169,6 +195,7 @@ public class BayesPacmanController extends Controller<MOVE>
 		direction_nominals.addElement("LEFT");
 		direction_nominals.addElement("NEUTRAL");
 		
+		//set the attributes
 		attributes[0] = new Attribute("totalGameTime");
 		attributes[1] = new Attribute("currentScore");
 		attributes[2] = new Attribute("numOfPillsLeft");
@@ -187,7 +214,5 @@ public class BayesPacmanController extends Controller<MOVE>
 		attributes[15] = new Attribute("pinkyDist");
 		attributes[16] = new Attribute("blinkyDist");
 		attributes[17] = new Attribute("directionChosen", direction_nominals);
-		
-		//current_instance.setDataset(dataset);
 	}
 }

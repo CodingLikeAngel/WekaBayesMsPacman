@@ -4,7 +4,7 @@ pacman.controllers
 pacman.controllers.examples
 pacman.entries.ghosts
 pacman.entries.pacman
-pacman.entries.pacman.decisiontree
 pacman.game
 pacman.game.internal
 pacman.game.util
+weka.api

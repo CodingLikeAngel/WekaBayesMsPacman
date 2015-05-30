@@ -11,25 +11,38 @@ import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.Discretize;
 
+/**
+ * Class that creates the bayes network.
+ * 
+ * @author Carlos Bailón Pérez and Daniel Castaño Estrella
+ * @version 1.0
+ */
 public class BayesNetGenerator
 {
-	private Instances dataset;
-	private BayesNet my_bayes_net;
-	private Instances dataset_orig;
+	private Instances dataset;			//dataset to use creating bayes network
+	private BayesNet my_bayes_net;		//bayes network
+	private Instances dataset_orig;		//variable to store dataset without being discretized
 
+	/**
+	 * Constructor of the class.
+	 * Builds and evaluate the bayes network.
+	 * @throws Exception
+	 */
 	public BayesNetGenerator() throws Exception
 	{
-		//GET DATASET
+		//GET DATA
+		//get dataset previously filtered by attribute selection in weka application
 		DataSource source = new DataSource("arff/pacman_attr_selected.arff");
 		dataset_orig = source.getDataSet();
 		
-		//SET CLASS
+		//set the class index (chosenDirection)
 		dataset_orig.setClassIndex(dataset_orig.numAttributes()-1);
 		
-		//COPY
+		//make a copy to avoid discretizing dataset_orig
 		dataset = new Instances(dataset_orig);
 		
-		//DISCRETIZE
+		//DISCRETIZATION
+		//set discretizing options
 		String[] options = new String[2];
 		options[0] = "-R";
 		options[1] = "first-last";
@@ -59,24 +72,27 @@ public class BayesNetGenerator
 		my_bayes_net = new BayesNet();
 		my_bayes_net.buildClassifier(dataset);
 		
-		//SEARCH ALGORITHM
+		//CLASSIFIER ALGORITHM
+		//set K2 classifier with max2 parents option
 		K2 search_alg = new K2();
 		String[] options_k2 = new String[4];
 		options_k2[0] = "-P"; options_k2[1] = "2";
-		options_k2[2] = "-S"; options_k2[3] = "LOO-CV";
+		options_k2[2] = "-S"; options_k2[3] = "Cumulative-CV";
 		search_alg.setOptions(options_k2);
 		
 		//ESTIMATOR
+		//Creates a simple estimator
 		SimpleEstimator estimator = new SimpleEstimator();
 		String[] options_estimator = new String[2];
 		options_estimator[0] = "-A"; options_estimator[1] = "0.5";
 		estimator.setOptions(options_estimator);
 		
-		//SETTING SEARCH ALG AND ESTIMATOR
+		//SETTING CLASSIFIER AND ESTIMATOR
 		my_bayes_net.setSearchAlgorithm(search_alg);
 		my_bayes_net.setEstimator(estimator);
 		
 		//EVALUATION
+		//validates the model with cross validation using leave one out cross validation method
 		Evaluation eval = new Evaluation(dataset);
 		eval.crossValidateModel(my_bayes_net,dataset,10,new Random(1));
 		
@@ -85,14 +101,26 @@ public class BayesNetGenerator
 		System.out.println("BAYES NET FINISHED!");
 	}
 	
+	/**
+	 * Getter method of the bayes network
+	 * @return bayes network
+	 */
 	public BayesNet getBayesNet() {
 		return my_bayes_net;
 	}
 	
+	/**
+	 * Getter method of the dataset
+	 * @return dataset
+	 */
 	public Instances getDataset() {
 		return dataset;
 	}
 	
+	/**
+	 * Getter method of the original dataset (without being discretized)
+	 * @return original dataset
+	 */
 	public Instances getDatasetOrig() {
 		return dataset_orig;
 	}
